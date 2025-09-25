@@ -1,14 +1,17 @@
 package com.marilyn.c_lockin
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -16,6 +19,7 @@ import com.marilyn.c_lockin.ui.screens.*
 import com.marilyn.c_lockin.ui.theme.CLockInTheme
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -27,12 +31,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CLockInApp() {
     val navController = rememberNavController()
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color(0xFFFFFFFF),
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -48,7 +54,7 @@ fun CLockInApp() {
                 LoginScreen(
                     onNavigateToRegister = { navController.navigate("register") },
                     onNavigateToMain = { navController.navigate("main") },
-                    onNavigateToForgotPassword = { navController.navigate("forgot_password") }
+                    onNavigateToEmailConfirmation = { navController.navigate("email_confirmation")}
                 )
             }
             composable("register") {
@@ -59,13 +65,15 @@ fun CLockInApp() {
             }
             composable("email_confirmation") {
                 EmailConfirmationScreen(
-                    onNavigateToLogin = { navController.navigate("login") }
+                    onNavigateToLogin = { navController.navigate("login") },
+                    onNavigateToRegister = { navController.navigate("register")}
                 )
             }
             composable("main") {
                 MainScreen(
                     onNavigateToCreateAlarm = { navController.navigate("create_alarm") },
-                    onNavigateToSettings = { navController.navigate("settings") }
+                    onNavigateToSettings = { navController.navigate("profile") },
+                    onNavigateToNotifications = { navController.navigate("notifications") }
                 )
             }
             composable("create_alarm") {
@@ -73,18 +81,14 @@ fun CLockInApp() {
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
-            composable("settings") {
-                SettingsScreen(
-                    onNavigateBack = { navController.popBackStack() },
-                    onNavigateToEditAccount = { navController.navigate("edit_account") },
-                    onNavigateToNotifications = { navController.navigate("notifications") }
-                )
-            }
-            composable("edit_account") {
+            composable("profile") {
                 EditAccountScreen(
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { navController.popBackStack() },
+                    onSaveAccount = { _, _, _, _ -> navController.popBackStack() },
+                    onLogout = { navController.navigate("login")}
                 )
             }
+
             composable("notifications") {
                 NotificationsScreen(
                     onNavigateBack = { navController.popBackStack() }
